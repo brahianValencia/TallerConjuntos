@@ -1,86 +1,80 @@
+import random
 
-
-def union(conjuntos):
-   unionConjuntos=[]
-
-   cantidadConjuntos=len(conjuntos)
-
-   for i in range(cantidadConjuntos):
-      
-      cantidadElementosConjunto=len(conjuntos[i])
-
-      for j in range(cantidadElementosConjunto):
-
-        if(conjuntos[i][j] not in unionConjuntos):
-         
-         unionConjuntos.append(conjuntos[i][j])
-
-   return unionConjuntos 
-           
-
-def interseccion(conjuntos):
-   interseccionConjuntos=[]
-
-   cantidadConjuntos=len(conjuntos)
-   
-   for i in range(cantidadConjuntos):
-      
-      cantidadElementosConjunto=len(conjuntos[i])
-
-      for j in range(cantidadElementosConjunto):
-         interseccionConjuntos.append(conjuntos[i][j])
-
-   #Toma únicamente los  elementos que estén en todos los conjuntos
-   interseccionConjuntos=list(set([x for x in interseccionConjuntos if interseccionConjuntos.count(x) > len(conjuntos)-1]))
-
-   return interseccionConjuntos 
-
-
-
-def diferencia(conjuntos):
-   diferenciaConjuntos=[]
-
-   cantidadConjuntos=len(conjuntos)
-   
-   for i in range(cantidadConjuntos-1):
-      cantidadElementosConjunto=len(conjuntos[i])
-
-      for j in range(cantidadElementosConjunto):
-
-        if conjuntos[i][j] not in conjuntos[i+1]:
-         diferenciaConjuntos.append(conjuntos[i][j])
-
-   return diferenciaConjuntos 
-
-
-def diferenciaSimetrica(conjuntos):
-    conjuntoUnion=[]
-    conjuntoInterseccion=[]
-    diferenciaSimetrica=[]
-    conjuntoUnion=union(conjuntos)
-    conjuntoInterseccion=interseccion(conjuntos)
+def union(A, B):
+    # Initialize an empty list for the union
+    setUnion = []
     
+    # Add elements from the first list if they are not already in the result list
+    for item in A:
+        if item not in setUnion:
+            setUnion.append(item)
+    
+    # Add elements from the second list if they are not already in the result list
+    for item in B:
+        if item not in setUnion:
+            setUnion.append(item)
+    
+    return setUnion
 
-    diferenciaSimetrica.append(conjuntoUnion)
-    diferenciaSimetrica.append(conjuntoInterseccion)
 
-    diferenciaSimetrica=diferencia(diferenciaSimetrica)
+def intersection(A, B):
+    # Initialize an empty list for the intersection
+    setIntersection = []
+    
+    # Add elements from the first list if they are in B
+    for item in A:
+        if item  in B:
+            setIntersection.append(item)
 
-    return diferenciaSimetrica
+    
+    return setIntersection
+
+
+def difference(A, B):
+    # Initialize an empty list for the difference
+    setDifference = []
+    
+    # Add elements from the first list if they are not in the second one
+    for item in A:
+        if item  not in B:
+            setDifference.append(item)
+
+    return setDifference
+
+def symmetricDifference(A, B):
+    # Initialize an empty list for the symmetric difference
+    setSymmetricDifference = []
+
+    setUnion=union(A,B)
+    setIntersection=intersection(A,B)
+    
+    setSymmetricDifference=difference(setUnion,setIntersection)
    
+    return setSymmetricDifference
 
-def subconjunto(conjuntos):
-    subconjunto=[]
-    subconjunto=union(conjuntos)[:-1]
-    return subconjunto
 
-def superconjunto(conjuntos):
-    superconjunto=[]
-
-    if len(conjuntos)>2: 
-        superconjunto=union(conjuntos)
+def subset(A, B):
+    
+    if len(B)==0:
+        localA=set(A)
+        
+        localA.pop()
+        
+        return localA
     else:
-       superconjunto = [x for x in conjuntos[-2] if x in conjuntos[-1]]
-       #No funciona, falta hacerlo para 2
-       
-    return superconjunto
+        return "It's a subset - They're subsets." if A in B else "It's not a subset - They're not subsets."
+    #return B
+    #Ternary operator
+   # return "It's a subset - They're subsets." if A in B else "It's not a subset - They're not subsets."
+
+def superset(A, B):
+   #Ternary operator
+   if len(B)==0:
+        localA=set(A)
+        
+        localA.add(str( (int(random.random()*100) )))
+        
+        return localA
+   else:
+     return "It's a superset - They're supersets." if A in B else "It's not a superset - They're not supersets."
+
