@@ -41,15 +41,19 @@ def difference(A, B):
 
     return setDifference
 
-def symmetricDifference(A, B):
+def symmetricDifference(A, B,index,lastElement):
     # Initialize an empty list for the symmetric difference
     setSymmetricDifference = []
-
-    setUnion=union(A,B)
-    setIntersection=intersection(A,B)
     
-    setSymmetricDifference=difference(setUnion,setIntersection)
-   
+    if index<lastElement:
+       setUnion=union(A,B) 
+       return setUnion
+    else:
+     setUnion=union(A,B)
+     setIntersection=intersection(A,B)
+    
+     setSymmetricDifference=difference(setUnion,setIntersection)
+ 
     return setSymmetricDifference
 
 

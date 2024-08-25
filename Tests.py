@@ -1,5 +1,5 @@
 
-import OperacionesConjuntos as op
+import SetOperations as op
 
 conjuntos= []
 A=[4,2,8]

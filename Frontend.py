@@ -1,8 +1,9 @@
 import streamlit as st
 from functools import reduce
-import OperacionesConjuntos as op
+import SetOperations as op
 import string
-
+from matplotlib import pyplot as plt
+from upsetplot import UpSet, from_contents
 
 def get_operation_string(operation, set_names):
     if operation == "Union":
@@ -51,7 +52,10 @@ def perform_set_operation(operation, input_sets):
     elif operation == "Symmetric difference":
         #lambda function that takes two sets x and y and returns their Symmetric difference. reduce applies the lambda function to the first two sets in input_sets,
         # then to the result and the next set, and so on, until all sets in input_sets have been processed.
-        return reduce(lambda x, y: op.symmetricDifference(x,y), input_sets)
+        
+        
+        
+        return reduce(lambda x, y: op.symmetricDifference(x,y,input_sets.index(y),len(input_sets)-1), input_sets)
     elif operation == "Subset":
         #lambda function that takes two sets x and y and returns their subset. reduce applies the lambda function to the first two sets in input_sets,
         # then to the result and the next set, and so on, until all sets in input_sets have been processed.
@@ -77,14 +81,17 @@ st.title("Set Operations")
 operation = st.selectbox("Operation:", ["Union", "Intersection", "Difference","Symmetric difference","Subset","Superset"])
 
 # Initialize the state for input sets if it doesn't exist
-if 'input_sets' not in st.session_state:
+if 'input_sets' not in st.session_state and (operation!="Subset" or operation!="Superset") :
     st.session_state.input_sets = [set(), set()]  # Start with 2 empty sets
+    
+
 
 # Allow user to specify the number of sets
 # Allow user to specify the number of sets
 min_sets = 1 if operation in ["Subset", "Superset"] else 2
 num_sets = st.number_input("Number of sets", min_value=min_sets, value=max(min_sets, len(st.session_state.input_sets)), step=1)
-#num_sets = st.number_input("Number of sets", min_value=2, value=len(st.session_state.input_sets), step=1)
+
+
 
 # Adjust the number of sets based on user input
 if num_sets > len(st.session_state.input_sets):
@@ -115,8 +122,17 @@ for i, input_set in enumerate(st.session_state.input_sets): #   goes through eac
 operation_string = get_operation_string(operation, set_names)
 st.write(f"Operation to perform: {operation_string}")
 
+# Define the layout for the buttons
+col1, col2 = st.columns(2)
 
-if st.button("Compute"):
+# Create buttons in the respective columns
+with col2:
+    reset_button = st.button("Reset")
+
+with col1:
+    compute_button = st.button("Compute")
+    
+if compute_button:
     input_sets = [s for s in st.session_state.input_sets if s]  # filters out any empty sets from st.session_state.input_sets.  
     if (operation in ["Subset", "Superset"] and len(input_sets) >= 1) or (operation not in ["Subset", "Superset"] and len(input_sets) >= 2): #checks if there are at least two non-empty sets.
         result = perform_set_operation(operation, input_sets)  # calls the perform_set_operation function with the selected operation and the list of non-empty sets.
@@ -127,9 +143,42 @@ if st.button("Compute"):
               st.success(f"Result: {{{', '.join(map(str, result))}}}")
             else:
               st.success(f"Result: {result}") #If the operation is successful, this line displays the result to the user.
+     
+     
+     
+        if len(input_sets) > 1:
+         #Display venn diagram
 
+         # Convert lists to a dictionary
+            data_dict = dict(zip(set_names, input_sets))
+
+
+            # Convert lists to UpSetPlot data
+            example = from_contents(data_dict)
+            
+            # Create the UpSet plot
+            fig = plt.figure(figsize=(10, 6))  # Adjust the size as needed
+            ax_dict = UpSet(example, show_counts="{:,}").plot(fig=fig)
+
+
+
+            # Display the plot in Streamlit
+            st.pyplot(fig)
+            
+        
+        
     else:
         if operation in ["Subset", "Superset"]:
             st.warning("Please enter at least one non-empty set.")
         else:
          st.warning("Please enter at least two non-empty sets.") # This displays a warning message to the user.
+         
+# Button to reset all inputs
+if reset_button:
+    if num_sets==1:
+        st.session_state.input_sets = [set()]
+    else:
+     st.session_state.input_sets = [set(), set()]
+    st.rerun()
+    
+    
